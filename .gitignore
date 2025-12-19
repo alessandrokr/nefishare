@@ -1,0 +1,6 @@
+build/
+dist/
+tests/
+*.log
+*.spec
+qrcode.png

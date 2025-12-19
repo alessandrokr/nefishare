@@ -48,5 +48,5 @@ Optionally, the URL can be shared via **QR code**.
 
 ### Clone the repository
 ```bash
-git clone https://github.com/yourusername/NeFiShare.git
-cd NeFiShare
+git clone https://github.com/alessandrokr/nefishare
+cd nefishare
