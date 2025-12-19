@@ -12,9 +12,9 @@ from PySide6.QtGui import QPixmap
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
-import uvicorn
-
 import qrcode
+import asyncio
+from uvicorn import Config, Server
 
 
 # ---------------- CONFIG ----------------
@@ -42,42 +42,29 @@ def get_local_ip():
 def start_server():
     app = FastAPI()
 
+    # --- your routes here ---
     @app.get("/", response_class=HTMLResponse)
     def index():
         links = ""
         for file_id, path in shared_files.items():
             name = os.path.basename(path)
             links += f'<li><a href="/download/{file_id}">{name}</a></li>'
-
-        return f"""
-        <html>
-        <head>
-            <title>NeFiShare</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-        </head>
-        <body>
-            <h1>📂 NeFiShare</h1>
-            <ul>{links}</ul>
-        </body>
-        </html>
-        """
+        return f"<html><body><h1>📁 NeFiShare</h1><ul>{links}</ul></body></html>"
 
     @app.get("/download/{file_id}")
     def download(file_id: str):
         if file_id not in shared_files:
-            raise HTTPException(status_code=404, detail="File not found")
-
+            raise HTTPException(status_code=404)
         path = shared_files[file_id]
         if not os.path.exists(path):
-            raise HTTPException(status_code=410, detail="File no longer exists")
+            raise HTTPException(status_code=410)
+        return FileResponse(path, filename=os.path.basename(path))
 
-        return FileResponse(
-            path,
-            filename=os.path.basename(path),
-            media_type="application/octet-stream"
-        )
+    # Use uvicorn.Server instead of uvicorn.run
+    config = Config(app=app, host="0.0.0.0", port=PORT, log_level="warning", loop="asyncio")
+    server = Server(config)
 
-    uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="warning")
+    asyncio.run(server.serve())
 
 
 class DropWindow(QWidget):
