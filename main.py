@@ -113,7 +113,7 @@ class DropWindow(QWidget):
                 shared_files[file_id] = os.path.abspath(path)
                 added += 1
         if added:
-            self.label.setText(f"✅ {added} file(s) shared")
+            self.label.setText(f"✅ {len(shared_files)} file(s) shared")
 
 # ---------------- MAIN ----------------
 if __name__ == "__main__":
