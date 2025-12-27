@@ -125,4 +125,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = DropWindow()
     window.show()
+    os.remove(QR_FILE)  # Clean up QR code file on exit
     sys.exit(app.exec())
